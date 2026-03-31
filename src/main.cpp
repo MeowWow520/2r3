@@ -1,23 +1,45 @@
 #include <iostream>
+#include <vector>
 #include <SDL3/SDL.h>
 
 
-bool IsGoing_ = true;
-struct WSize_ {
-    char* title;
-    int wight; 
-    int height;
+struct RGB {
+    Uint8 r;
+    Uint8 g;
+    Uint8 b;
 };
+struct vec2 {
+    int x;
+    int y;
+};
+
+bool IsGoing_ = true;
+const char* Title = "2r3";
+int width = 1960;
+int height =  1080;
+SDL_Window* window_ = nullptr;
+SDL_Renderer* renderer_ = nullptr;
+
+const RGB backgrd = {2, 62, 138};
+const RGB obj = {255, 0, 110};
+const RGB line = {254, 228, 64};
+
+std::vector<vec2> vec2list;
+const SDL_FRect frect = {100.00, 0.00, 100.00, 100.00};
+
+
 bool Initlib(bool flags);
 void HendleEvents();
 void Update();
 void Render();
+int transX(int x);
+int transY(int y);
+
 
 
 int main(int argc, char* argv) 
 {
     (void)argc, (void)argv;
-    // std::cout << u8"hello world";
     SDL_Log("Hello 2r3");
 
     // init SDL library
@@ -25,16 +47,12 @@ int main(int argc, char* argv)
         SDL_Log("init SDL library successfully");
     };
 
-    WSize_ WindowSize = {"2r3", 1960, 1080};
-    SDL_Window* window = nullptr;
-    SDL_Renderer* renderer = nullptr;
-
     // create window and renderer
-    window = SDL_CreateWindow(WindowSize.title, 
-                             WindowSize.wight, 
-                             WindowSize.height, 
-                             SDL_WINDOW_RESIZABLE);
-    renderer = SDL_CreateRenderer(window, NULL);
+    window_ = SDL_CreateWindow(Title, 
+                              width, 
+                              height, 
+                              SDL_WINDOW_RESIZABLE);
+    renderer_ = SDL_CreateRenderer(window_, NULL);
 
     // main loop
     while(IsGoing_) {
@@ -42,8 +60,13 @@ int main(int argc, char* argv)
         Update();
         Render();
     }
+
+    // destroy window and renderer
+    SDL_DestroyRenderer(renderer_);
+    SDL_DestroyWindow(window_);
     SDL_Quit();
 }
+
 
 
 bool Initlib(bool flags) {
@@ -71,5 +94,24 @@ void Update() {
 };
 
 void Render() {
-    return;
+    SDL_SetRenderDrawColor(renderer_, backgrd.r, backgrd.g, backgrd.b, 255);
+    SDL_RenderClear(renderer_);
+
+
+    SDL_SetRenderDrawColor(renderer_, line.r, line.g, line.b, 255);
+    SDL_RenderFillRect(renderer_, &frect);
+
+
+    SDL_RenderPresent(renderer_);
+
+}
+
+int transX(int x)
+{ 
+    return x + width / 2;
+};
+
+int transY(int y)
+{ 
+    return height / 2 - y;
 };
