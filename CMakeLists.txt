@@ -2,7 +2,7 @@
 # 项目主配置文件
 # ============================================
 cmake_minimum_required(VERSION 3.10.0)
-project(EscapeFromGhost VERSION 0.1.0 LANGUAGES C CXX)
+project(2r3 VERSION 0.1.0 LANGUAGES C CXX)
 
 # ============================================
 # 基础配置
