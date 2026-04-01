@@ -9,14 +9,7 @@
 /cmake_test
 /build
 
-# 忽略 claude 相关文件
-/.claude
-/CLAUDE.md
+# 忽略 exe 输出
 
-# 忽略下载的依赖库
-/external/SDL-release-*/
-/external/SDL_image-release-*/
-/external/SDL_mixer-release-*/
-/external/SDL_ttf-release-*/
-/external/glm-*/
-/external/spdlog-*/
+/2r3_Windows.pdb
+/2r3_Windows.exe
