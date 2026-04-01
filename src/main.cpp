@@ -28,31 +28,33 @@ const RGB BACKGRD = {2  , 62 , 138}; // #023E8A
 const RGB POINT   = {255, 0  , 110}; // #FF016E
 const RGB LINE    = {254, 228, 64 }; // #FEE440
 
-std::vector<vec3> _3DPointList;
-
-std::vector<SDL_FRect> _2DPointList = {
-    {100.00, 0.00  , POINT_SIZE, POINT_SIZE},
-    {200.00, 50.00 , POINT_SIZE, POINT_SIZE},
-    {300.00, 100.00, POINT_SIZE, POINT_SIZE},
-    {400.00, 150.00, POINT_SIZE, POINT_SIZE},
-    {500.00, 200.00, POINT_SIZE, POINT_SIZE},
-    {600.00, 250.00, POINT_SIZE, POINT_SIZE},
-    {700.00, 300.00, POINT_SIZE, POINT_SIZE}
+// 标准正交坐标系 x, y, z
+std::vector<vec3> _3DPointList = {
+    {-100,  100, -100},
+    {-100,  100,  100},
+    { 100,  100,  100},
+    { 100,  100, -100},
+    {-100, -100, -100},
+    {-100, -100,  100},
+    { 100, -100, -100},
+    { 100, -100,  100}
 };
+
+std::vector<SDL_FRect> _2DPointList;
 
 
 bool Initlib(bool flags);
 void HendleEvents();
 void Update();
 void Render();
-int transX(int x);
-int transY(int y);
+float transX(float x);
+float transY(float y);
 void SetDrawColor(RGB rgb);
 void DrawBACKGRD();
 void DrawLINES();
 void DrawPOINT(SDL_FRect fr);
 void DrawPOINTS();
-
+void Update2Detas();
 
 int main(int argc, char* argv) 
 {
@@ -119,24 +121,24 @@ void HendleEvents() {
 };
 
 void Update() {
-    return;
+    Update2Detas();
 };
 
 void Render() {
-    // DrawBACKGRD();
+    DrawBACKGRD();
     // DrawLINES();
-    // DrawPOINTS();
-    // SDL_RenderPresent(renderer_);
+    DrawPOINTS();
+    SDL_RenderPresent(renderer_);
 }
 
-int transX(int x)
+float transX(float x)
 { 
-    return x + width_ / 2;
+    return x + (float)(width_ / 2);
 };
 
-int transY(int y)
+float transY(float y)
 { 
-    return height_ / 2 - y;
+    return (float)(height_ / 2) - y;
 }
 
 void SetDrawColor(RGB rgb)
@@ -156,10 +158,22 @@ void DrawLINES() {
 
 void DrawPOINT(SDL_FRect fr) {
     SetDrawColor(POINT);
-    SDL_RenderFillRect(renderer_, &fr);
+    SDL_FRect Temp = {fr.x - (POINT_SIZE / 2),
+                      fr.y - (POINT_SIZE / 2),
+                      POINT_SIZE, POINT_SIZE};
+    SDL_RenderFillRect(renderer_, &Temp);
 };
 
 void DrawPOINTS() {
     for (int i = 0; i < _2DPointList.size(); i++)
         DrawPOINT(_2DPointList[i]);
+};
+
+void Update2Detas() {
+    for (int i = 0; i < _3DPointList.size(); i++) {
+        SDL_FRect Temp = {transX(_3DPointList[i].x),
+                          transY(_3DPointList[i].y),
+                          POINT_SIZE, POINT_SIZE  };
+        _2DPointList.push_back(Temp);
+    }
 };
