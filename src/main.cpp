@@ -25,6 +25,7 @@ struct vec3 {
     float y;
     float z;
 };
+
 // 主循环的开关 true 代表运行主循环；false 代表停止主循环
 bool IsGoing_ = true;
 // 是否打印当前的帧率
@@ -34,9 +35,14 @@ const char* Title_ = "2r3";
 // 渲染“点”的大小。点为一个正方形图像，这是图像的边长
 const float POINT_SIZE = 10.00;
 // 窗口的长
-const int width_ = 1960;
+const int width_ = 800;
 // 窗口的高
-const int height_ =  1080;
+const int height_ =  800;
+
+// 3D 投影参数
+float FOCAL_LENGTH = 1000.0f;  // 焦距（决定透视强度）
+float CAMERA_Z = 500.0f;      // 相机距离
+float rotationY = 0.0f;       // Y轴旋转角度
 
 
 SDL_Window* window_ = nullptr;
@@ -86,6 +92,13 @@ float transX(float x);
  */
 float transY(float y);
 /**
+ * rotateY 是将 3 维点绕 Y 轴旋转的函数
+ * @param point 原始 3 维点
+ * @param angle 旋转角度（弧度）
+ * @return 旋转后的 3 维点
+ */
+vec3 rotateY(vec3 point, float angle);
+/**
  * SetDrawColor 是设置画笔颜色的函数。
  * @param rgb 画笔的颜色
  */
@@ -93,6 +106,7 @@ void SetDrawColor(RGB rgb);
 // 画制背景
 void DrawBACKGRD();
 // 画制线段
+void DrawLINE();
 void DrawLINES();
 /** 
  * 画制单个点
@@ -101,7 +115,6 @@ void DrawLINES();
 void DrawPOINT(SDL_FRect fr);
 // 画制所有点
 void DrawPOINTS();
-void Update3Detas();
 void Update2Detas();
 
 
@@ -170,12 +183,14 @@ void HendleEvents() {
 };
 
 void Update() {
+    rotationY += 0.02f;  // 每帧旋转
+    CAMERA_Z = 750.0f;  
     Update2Detas();
 };
 
 void Render() {
     DrawBACKGRD();
-    // DrawLINES();
+    DrawLINES();
     DrawPOINTS();
     SDL_RenderPresent(renderer_);
 }
@@ -186,8 +201,18 @@ float transX(float x)
 };
 
 float transY(float y)
-{ 
+{
     return (float)(height_ / 2) - y;
+}
+
+vec3 rotateY(vec3 point, float angle) {
+    float cosA = cos(angle);
+    float sinA = sin(angle);
+    return {
+        point.x * cosA - point.z * sinA,
+        point.y,
+        point.x * sinA + point.z * cosA
+    };
 }
 
 void SetDrawColor(RGB rgb)
@@ -201,9 +226,15 @@ void DrawBACKGRD() {
     SDL_RenderFillRect(renderer_, &BackGRD_FR);
 };
 
-void DrawLINES() {
+void DrawLINE() {
     SetDrawColor(LINE);
 };
+
+void DrawLINES() {
+
+};
+
+
 
 void DrawPOINT(SDL_FRect fr) {
     SetDrawColor(POINT);
@@ -218,17 +249,26 @@ void DrawPOINTS() {
         DrawPOINT(_2DPointList[i]);
 };
 
-void Update3Detas() {
-    for (int i = 0; i < _3DPointList.size(); i++) {
-        _3DPointList[i].x = _3DPointList[i].x / _3DPointList[i].z;
-        _3DPointList[i].y = _3DPointList[i].y / _3DPointList[i].z;
-    }
-}
 void Update2Detas() {
-    for (int i = 0; i < _3DPointList.size(); i++) {
-        SDL_FRect Temp = {transX(_3DPointList[i].x),
-                          transY(_3DPointList[i].y),
-                          POINT_SIZE, POINT_SIZE  };
+    _2DPointList.clear();  // 清空旧数据
+
+    for (const auto& point : _3DPointList) {
+        // 先旋转点
+        vec3 rotated = rotateY(point, rotationY);
+        // 计算点到相机的距离
+        float depth = rotated.z + CAMERA_Z;
+        // 避免除零错误
+        if (depth <= 0.1f) depth = 0.1f;
+        // 透视投影公式
+        float projectedX = (rotated.x * FOCAL_LENGTH) / depth;
+        float projectedY = (rotated.y * FOCAL_LENGTH) / depth;
+        // 根据深度调整点的大小
+        float size = POINT_SIZE * (FOCAL_LENGTH / depth);
+        SDL_FRect Temp = {
+            transX(projectedX),
+            transY(projectedY),
+            size, size
+        };
         _2DPointList.push_back(Temp);
     }
 };
