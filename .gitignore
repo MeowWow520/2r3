@@ -13,3 +13,6 @@
 
 /2r3_Windows.pdb
 /2r3_Windows.exe
+
+# 忽略 claude 输出
+/claude-output.md

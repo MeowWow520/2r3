@@ -3,6 +3,7 @@
 #include <SDL3/SDL.h>
 
 
+
 struct RGB {
     Uint8 r;
     Uint8 g;
@@ -15,21 +16,28 @@ struct vec3 {
 };
 
 bool IsGoing_ = true;
+bool IsLogFPS_ = false;
 const char* Title_ = "2r3";
+const float POINT_SIZE = 10.00;
 int width_ = 1960;
 int height_ =  1080;
-const float POINT_SIZE = 10.00;
 SDL_Window* window_ = nullptr;
 SDL_Renderer* renderer_ = nullptr;
 
-const RGB BACKGRD = {2  , 62 , 138};
-const RGB POINT   = {255, 0  , 110};
-const RGB lINE    = {254, 228, 64 };
+const RGB BACKGRD = {2  , 62 , 138}; // #023E8A
+const RGB POINT   = {255, 0  , 110}; // #FF016E
+const RGB LINE    = {254, 228, 64 }; // #FEE440
 
 std::vector<vec3> _3DPointList;
 
-std::vector<SDL_FRect> PointList = {
-    {100.00, 0.00, POINT_SIZE, POINT_SIZE} // 测试 Rect
+std::vector<SDL_FRect> _2DPointList = {
+    {100.00, 0.00  , POINT_SIZE, POINT_SIZE},
+    {200.00, 50.00 , POINT_SIZE, POINT_SIZE},
+    {300.00, 100.00, POINT_SIZE, POINT_SIZE},
+    {400.00, 150.00, POINT_SIZE, POINT_SIZE},
+    {500.00, 200.00, POINT_SIZE, POINT_SIZE},
+    {600.00, 250.00, POINT_SIZE, POINT_SIZE},
+    {700.00, 300.00, POINT_SIZE, POINT_SIZE}
 };
 
 
@@ -40,7 +48,10 @@ void Render();
 int transX(int x);
 int transY(int y);
 void SetDrawColor(RGB rgb);
-
+void DrawBACKGRD();
+void DrawLINES();
+void DrawPOINT(SDL_FRect fr);
+void DrawPOINTS();
 
 
 int main(int argc, char* argv) 
@@ -61,10 +72,22 @@ int main(int argc, char* argv)
     renderer_ = SDL_CreateRenderer(window_, NULL);
 
     // main loop
+    auto FrameTime = (1e9 / 60);
+    auto deltaTime = 0.0f;
     while(IsGoing_) {
+        auto StartTicks= SDL_GetTicksNS();
+
         HendleEvents();
         Update();
         Render();
+
+        auto EndTicks = SDL_GetTicksNS();  
+        auto Diffent = EndTicks - StartTicks;
+        if (Diffent <  FrameTime) {
+            SDL_Delay((Uint32)((FrameTime - Diffent) / 1e6));
+            deltaTime = (float)(FrameTime / 1e9);
+        } else { deltaTime = (float)(Diffent / 1e9); }
+        if (IsLogFPS_) SDL_Log("Current FPS: %f", 1 / deltaTime);
     }
 
     // destroy window and renderer
@@ -100,16 +123,10 @@ void Update() {
 };
 
 void Render() {
-    SetDrawColor(BACKGRD);
-    SDL_RenderClear(renderer_);
-
-    // <!-- start for test -->
-    SetDrawColor(POINT);
-    SDL_RenderFillRect(renderer_, &PointList[0]);
-    // <!-- end for test   -->
-
-    SDL_RenderPresent(renderer_);
-
+    // DrawBACKGRD();
+    // DrawLINES();
+    // DrawPOINTS();
+    // SDL_RenderPresent(renderer_);
 }
 
 int transX(int x)
@@ -122,8 +139,27 @@ int transY(int y)
     return height_ / 2 - y;
 }
 
-void SetDrawColor(RGB rgb) 
+void SetDrawColor(RGB rgb)
 {
-    SDL_RenderClear(renderer_);
     SDL_SetRenderDrawColor(renderer_, rgb.r, rgb.g, rgb.b, 255);
+}
+
+void DrawBACKGRD() {
+    SDL_FRect BackGRD_FR = {0.00, 0.00, (float)width_, (float)height_};
+    SetDrawColor(BACKGRD);
+    SDL_RenderFillRect(renderer_, &BackGRD_FR);
+};
+
+void DrawLINES() {
+    SetDrawColor(LINE);
+};
+
+void DrawPOINT(SDL_FRect fr) {
+    SetDrawColor(POINT);
+    SDL_RenderFillRect(renderer_, &fr);
+};
+
+void DrawPOINTS() {
+    for (int i = 0; i < _2DPointList.size(); i++)
+        DrawPOINT(_2DPointList[i]);
 };
