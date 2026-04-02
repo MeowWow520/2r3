@@ -44,7 +44,7 @@ const char* Title_ = "2r3";
 const int FPS = 60;
 const float POINT_SIZE = 10.00;
 // 窗口的长
-const int Width = 800;
+const int Width_ = 800;
 // 窗口的高
 const int Height_ =  800;
 
@@ -147,7 +147,7 @@ int main(int argc, char* argv)
 
     // create window and renderer
     window_ = SDL_CreateWindow(Title_, 
-                               Width, 
+                               Width_, 
                                Height_, 
                                SDL_WINDOW_RESIZABLE);
     renderer_ = SDL_CreateRenderer(window_, NULL);
@@ -214,7 +214,7 @@ void Render() {
 
 float transX(float x)
 { 
-    return x + (float)(Width / 2);
+    return x + (float)(Width_ / 2);
 };
 
 float transY(float y)
@@ -238,7 +238,7 @@ void SetDrawColor(RGB rgb)
 }
 
 void DrawBACKGRD() {
-    SDL_FRect BackGRD_FR = {0.00, 0.00, (float)Width, (float)Height_};
+    SDL_FRect BackGRD_FR = {0.00, 0.00, (float)Width_, (float)Height_};
     SetDrawColor(BACKGRD);
     SDL_RenderFillRect(renderer_, &BackGRD_FR);
 };
