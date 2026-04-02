@@ -1,7 +1,7 @@
 ## 2r3
 
 ### 关于
-2r3, 是使用 2D 渲染库渲染 3D 图形的“技术”，仅使用 C++ 官方库 和 SDL3 库。*实现思路* -> [approach.md](./approach.md)
+2r3, 是使用 2D 渲染库渲染 3D 图形的“技术”，仅使用 C++ 官方库 和 [SDL3 库](https://wiki.libsdl.org/SDL3/FrontPage)。*实现思路* -> [approach.md](./approach.md)
 
 
 ```
