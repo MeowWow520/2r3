@@ -1,7 +1,8 @@
 ## 实现思路
 
 ### 灵感来源
-<iframe width="1696" height="679" src="https://www.youtube.com/embed/qjWkNZ0SXfo" title="One Formula That Demystifies 3D Graphics" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+[![Watch the video](https://img.youtube.com/vi/qjWkNZ0SXfo/maxresdefault.jpg)](https://www.youtube.com/embed/qjWkNZ0SXfo)
 
 ## 变量含义
 
