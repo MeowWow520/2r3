@@ -31,9 +31,43 @@
 - **LineList**：渲染的线段列表，每个元素的类型为 `vec2`
 
 ## 方法含义
+
+### 示意图集
+
+<table>
+  <tr>
+    <td><img src="./assets/2r3- example.png" width="200"></td>
+  </tr>
+</table>
+
 ### 更新逻辑 Update()
 
-3D 原始点 → rotateY 旋转 → 计算深度 → 透视投影 → 坐标转换 → 2D 渲染点
+
+以下是您提供的更新逻辑的更易读排版：
+
+---
+
+### 更新逻辑 Update()
+
+
+在 `Update()` 中
+通过对 Y 轴进行旋转、对“相机”距离原点的距离进行操作。
+    Update2Detas();
+
+```
+  操作       |   对应变量
+3D 原始点       _3DPointList[i]
+            ↓
+旋转         ↓  rotated
+            ↓
+计算深度     ↓  depth
+            ↓
+透视投影     ↓  projectedX & projectedY
+            ↓
+坐标转换     ↓  transX()
+            ↓
+2D 渲染点    X  _2DPointList.push_back()
+```
 
 ### 渲染逻辑 Render()
 
