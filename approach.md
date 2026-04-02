@@ -36,23 +36,16 @@
 
 <table>
   <tr>
-    <td><img src="./assets/2r3- example.png" width="200"></td>
+    <td><img src="./assets/2r3-example.png" width="400"></td>
+    <td><img src="./assets/3DDataTransformationFlow.png" width="400"></td>
+    <td><img src="./assets/RenderingSystemDataFlow.png" width="400"></td>
+
   </tr>
 </table>
 
-### 更新逻辑 Update()
-
-
-以下是您提供的更新逻辑的更易读排版：
-
----
 
 ### 更新逻辑 Update()
 
-
-在 `Update()` 中
-通过对 Y 轴进行旋转、对“相机”距离原点的距离进行操作。
-    Update2Detas();
 
 ```
   操作       |   对应变量
