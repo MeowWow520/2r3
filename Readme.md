@@ -1,7 +1,7 @@
 ## 2r3
 
-### About
-2r3, which means "2d lib renders 3d objects". Just use a simple formula and it can render 3D objects by including [SDL3 Library](https://wiki.libsdl.org/SDL3/FrontPage) and using C++ langange. **for approach**, see -> [approach.md](./approach.md)
+### 关于
+2r3, 是使用 2D 渲染库渲染 3D 图形的“技术”，仅使用 C++ 官方库 和 SDL3 库。*实现思路* -> [approach.md](./approach.md)
 
 
 ```
