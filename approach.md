@@ -1,7 +1,9 @@
 ## 实现思路
 
+### 灵感来源
+<iframe width="1696" height="679" src="https://www.youtube.com/embed/qjWkNZ0SXfo" title="One Formula That Demystifies 3D Graphics" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-### 变量含义
+## 变量含义
 
 - **RGB**：RGB 是一个结构体，它以 RGB 格式来存放一个色值。每一个成员变量的大小范围 [0, 255]
 - **vec3**：vec3 是一个三维变量，用于存放在三维正交坐标系中的坐标值
@@ -22,6 +24,7 @@
 - **_3DPointList**：在标准正交坐标系中的 3 维点的集合
 - **_2DPointList**：经过透视投影和坐标转换后，用于 SDL 渲染的 2 维图形（矩形）的集合
 
+## 方法含义
 ### 更新逻辑 Update()
 
 3D 原始点 → rotateY 旋转 → 计算深度 → 透视投影 → 坐标转换 → 2D 渲染点
