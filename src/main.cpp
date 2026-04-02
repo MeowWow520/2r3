@@ -14,6 +14,12 @@ struct RGB {
     Uint8 g;
     Uint8 b;
 };
+
+struct vec2 {
+    int s;
+    int e;
+};
+
 /**
  * vec3 是一个三位变量，它存放在三维正交坐标系中的坐标值。
  * @param x 三维正交坐标系的 x 坐标
@@ -25,19 +31,22 @@ struct vec3 {
     float y;
     float z;
 };
-
 // 主循环的开关 true 代表运行主循环；false 代表停止主循环
 bool IsGoing_ = true;
 // 是否打印当前的帧率
 bool IsLogFPS_ = false;
+bool IsDrawBACKGRD_ = true;
+bool IsDrawLINE_ = true;
+bool IsDrawPOINTS_ = true;
 // 窗口标题
 const char* Title_ = "2r3";
 // 渲染“点”的大小。点为一个正方形图像，这是图像的边长
+const int FPS = 60;
 const float POINT_SIZE = 10.00;
 // 窗口的长
-const int width_ = 800;
+const int Width = 800;
 // 窗口的高
-const int height_ =  800;
+const int Height_ =  800;
 
 // 3D 投影参数
 float FOCAL_LENGTH = 1000.0f;  // 焦距（决定透视强度）
@@ -57,18 +66,27 @@ const RGB LINE    = {254, 228, 64 }; // #FEE440
 
 // 在标准正交坐标系中的 3 维点的集合
 std::vector<vec3> _3DPointList = {
-    {-100,  100, -100},
-    {-100,  100,  100},
-    { 100,  100, -100},
-    { 100,  100,  100},
-    {-100, -100, -100},
-    {-100, -100,  100},
-    { 100, -100, -100},
-    { 100, -100,  100}
+    // x     y     z    索引
+    {-100,  100, -100}, // 0
+    {-100,  100,  100}, // 1
+    { 100,  100, -100}, // 2
+    { 100,  100,  100}, // 3
+    {-100, -100, -100}, // 4
+    {-100, -100,  100}, // 5
+    { 100, -100, -100}, // 6
+    { 100, -100,  100}  // 7
 };
 
 // SDL 渲染的 2 维图形的集合
 std::vector<SDL_FRect> _2DPointList;
+
+std::vector<vec2> LineList = {
+    //  | 结束点      | 起始点
+    {0, 1}, {0, 2}, {0, 4},
+    {1, 3}, {1, 5}, {3, 2},
+    {3, 7}, {2, 6}, {4, 5},
+    {4, 6}, {5, 7}, {7, 6}
+};
 
 /**
  * Initlib 是初始化的时候，判断是否失败的函数
@@ -106,7 +124,7 @@ void SetDrawColor(RGB rgb);
 // 画制背景
 void DrawBACKGRD();
 // 画制线段
-void DrawLINE();
+void DrawLINE(vec2 vc2);
 void DrawLINES();
 /** 
  * 画制单个点
@@ -124,19 +142,18 @@ int main(int argc, char* argv)
     SDL_Log("Hello 2r3");
 
     // init SDL library
-    if (Initlib(SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO))) {
+    if (Initlib(SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO)))
         SDL_Log("init SDL library successfully");
-    };
 
     // create window and renderer
     window_ = SDL_CreateWindow(Title_, 
-                              width_, 
-                              height_, 
-                              SDL_WINDOW_RESIZABLE);
+                               Width, 
+                               Height_, 
+                               SDL_WINDOW_RESIZABLE);
     renderer_ = SDL_CreateRenderer(window_, NULL);
 
     // main loop
-    auto FrameTime = (1e9 / 60);
+    auto FrameTime = (1e9 / FPS);
     auto deltaTime = 0.0f;
     while(IsGoing_) {
         auto StartTicks= SDL_GetTicksNS();
@@ -183,26 +200,26 @@ void HendleEvents() {
 };
 
 void Update() {
-    rotationY += 0.02f;  // 每帧旋转
-    CAMERA_Z = 750.0f;  
+    rotationY += 0.02f;
+    CAMERA_Z += 1.00f;
     Update2Detas();
 };
 
 void Render() {
-    DrawBACKGRD();
-    DrawLINES();
-    DrawPOINTS();
+    if (IsDrawBACKGRD_) DrawBACKGRD();
+    if (IsDrawLINE_) DrawLINES();
+    if (IsDrawPOINTS_) DrawPOINTS();
     SDL_RenderPresent(renderer_);
 }
 
 float transX(float x)
 { 
-    return x + (float)(width_ / 2);
+    return x + (float)(Width / 2);
 };
 
 float transY(float y)
 {
-    return (float)(height_ / 2) - y;
+    return (float)(Height_ / 2) - y;
 }
 
 vec3 rotateY(vec3 point, float angle) {
@@ -221,17 +238,27 @@ void SetDrawColor(RGB rgb)
 }
 
 void DrawBACKGRD() {
-    SDL_FRect BackGRD_FR = {0.00, 0.00, (float)width_, (float)height_};
+    SDL_FRect BackGRD_FR = {0.00, 0.00, (float)Width, (float)Height_};
     SetDrawColor(BACKGRD);
     SDL_RenderFillRect(renderer_, &BackGRD_FR);
 };
 
-void DrawLINE() {
+void DrawLINE(vec2 vc2) {
     SetDrawColor(LINE);
+    int start = vc2.s;
+    int end   = vc2.e;
+    float x1, y1, x2, y2;
+    x1 = _2DPointList[start].x;
+    y1 = _2DPointList[start].y;
+    x2 = _2DPointList[end].x;
+    y2 = _2DPointList[end].y;
+    SDL_RenderLine(renderer_, x1, y1, x2, y2);
 };
 
 void DrawLINES() {
-
+    for (const auto& Line : LineList) {
+        DrawLINE(Line);
+    }
 };
 
 
@@ -258,7 +285,7 @@ void Update2Detas() {
         // 计算点到相机的距离
         float depth = rotated.z + CAMERA_Z;
         // 避免除零错误
-        if (depth <= 0.1f) depth = 0.1f;
+        if (depth <= 0.001f) depth = 0.001f;
         // 透视投影公式
         float projectedX = (rotated.x * FOCAL_LENGTH) / depth;
         float projectedY = (rotated.y * FOCAL_LENGTH) / depth;
