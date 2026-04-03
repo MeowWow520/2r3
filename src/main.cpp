@@ -88,6 +88,13 @@ std::vector<vec2> LineList = {
     {4, 6}, {5, 7}, {7, 6}
 };
 
+bool IsKeyDown[4] = { 
+    false, // SDLK_W
+    false, // SDLK_A
+    false, // SDLK_S
+    false  // SDLK_D
+};
+
 /**
  * Initlib 是初始化的时候，判断是否失败的函数
  * @param flags 传入的一个逻辑表达式。正常工作应传入 true
@@ -194,15 +201,30 @@ void HendleEvents() {
                 SDL_Log("Recieving SDL_EVENT_QUIT, main loop quit");
                 break;
             }
+            case(SDL_EVENT_KEY_DOWN): {
+                switch (event.key.key) {
+                    case(SDLK_ESCAPE): { IsGoing_ = false; break; }
+                    case(SDLK_F1): { IsDrawPOINTS_ =!IsDrawPOINTS_; break; }
+                    case(SDLK_F2): { IsDrawLINE_ =!IsDrawLINE_; break; };
+
+                    case(SDLK_W): { IsKeyDown[0] = true; break; };
+                    case(SDLK_A): { IsKeyDown[1] = true; break; };
+                    case(SDLK_S): { IsKeyDown[2] = true; break; };
+                    case(SDLK_D): { IsKeyDown[3] = true; break; };
+                    default: break; 
+                }
+                break;
+            };
             default: break; 
         }
     }
 };
 
 void Update() {
-    rotationY += 0.02f;
-    CAMERA_Z += 1.00f;
+    rotationY += 0.03f;
     Update2Detas();
+    if (IsKeyDown[0]) CAMERA_Z -= 10.00f;
+    if (IsKeyDown[2]) CAMERA_Z += 10.00f;
 };
 
 void Render() {
@@ -210,6 +232,7 @@ void Render() {
     if (IsDrawLINE_) DrawLINES();
     if (IsDrawPOINTS_) DrawPOINTS();
     SDL_RenderPresent(renderer_);
+    for (int i = 0 ; i < sizeof(IsKeyDown)/sizeof(IsKeyDown[0]); i++) IsKeyDown[i] = false;
 }
 
 float transX(float x)
@@ -256,12 +279,9 @@ void DrawLINE(vec2 vc2) {
 };
 
 void DrawLINES() {
-    for (const auto& Line : LineList) {
+    for (const auto& Line : LineList)
         DrawLINE(Line);
-    }
 };
-
-
 
 void DrawPOINT(SDL_FRect fr) {
     SetDrawColor(POINT);
@@ -294,9 +314,7 @@ void Update2Detas() {
         SDL_FRect Temp = {
             transX(projectedX),
             transY(projectedY),
-            size, size
-        };
+            size, size };
         _2DPointList.push_back(Temp);
     }
 };
-
