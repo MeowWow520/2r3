@@ -9,4 +9,4 @@
 
 ### Docs
 
-更新更详细的原理文档 [app](app.md)
+更新更详细的原理文档 [approach.md](approach.md)
