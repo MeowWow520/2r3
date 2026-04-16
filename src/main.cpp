@@ -102,7 +102,8 @@ std::vector<vec2> LineList = {
  * 其中 vec3 的三个数值为 _3DPointList 的点的集合
  */
 std::vector<vec3> SurfaceList = {
-    {0, 1, 2}, {1, 2, 3}, {2, 3, 4}
+    {1, 4, 5}, {1, 4, 0}, {3, 5, 7},
+    {1, 3, 5}
 };
 
 
@@ -267,10 +268,10 @@ void HendleEvents() {
             }
             case(SDL_EVENT_KEY_DOWN): {
                 switch (event.key.key) {
-                    case(SDLK_ESCAPE): { IsGoing_  = !IsGoing_;      break; }
-                    case(SDLK_F1): { IsDrawPOINTS_ = !IsDrawPOINTS_; break; }
-                    case(SDLK_F2): { IsDrawLINE_   = !IsDrawLINE_;   break; };
-
+                    case(SDLK_ESCAPE): { IsGoing_   = !IsGoing_;       break; };
+                    case(SDLK_F1): { IsDrawPOINTS_  = !IsDrawPOINTS_;  break; };
+                    case(SDLK_F2): { IsDrawLINE_    = !IsDrawLINE_;    break; };
+                    case(SDLK_F3): { IsDrawSurface_ = !IsDrawSurface_; break; };
                     case(SDLK_W): { IsKeyDown[0] = true; break; };
                     case(SDLK_A): { IsKeyDown[1] = true; break; };
                     case(SDLK_S): { IsKeyDown[2] = true; break; };
@@ -414,19 +415,19 @@ void Update2Detas()
 void DrawSurface(vec3 sf)
 {
     // 三个点
-    SDL_FRect p1 = _2DPointList[sf.x];
+    SDL_FRect p1 = _2DPointList[(int)sf.x];
     SDL_Vertex face[3];
     for (int i = 0; i < 3; i++) {
         face[i].color = {SURFACE.r / 255.00f,
                          SURFACE.g / 255.00f,
                          SURFACE.b / 255.00f, 0};
     }
-    face[0].position.x = _2DPointList[sf.x].x;
-    face[0].position.y = _2DPointList[sf.x].y;
-    face[1].position.x = _2DPointList[sf.y].x;
-    face[1].position.y = _2DPointList[sf.y].y;
-    face[2].position.x = _2DPointList[sf.z].x;
-    face[2].position.y = _2DPointList[sf.z].y;
+    face[0].position.x = _2DPointList[(int)sf.x].x;
+    face[0].position.y = _2DPointList[(int)sf.x].y;
+    face[1].position.x = _2DPointList[(int)sf.y].x;
+    face[1].position.y = _2DPointList[(int)sf.y].y;
+    face[2].position.x = _2DPointList[(int)sf.z].x;
+    face[2].position.y = _2DPointList[(int)sf.z].y;
 
     SDL_RenderGeometry(renderer_, NULL, face, 3, NULL, 0);
 };
