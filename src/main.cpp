@@ -5,7 +5,7 @@
 #include <SDL3/SDL.h>
 
 
-#define WHEEL_RUN_SCALE 10.00f;
+#define WHEEL_RUN_SCALE 35.00f;
 #define MOUTH_RUN_SCALE 00.05f;
 /**
  * RGB 是一个自定义的结构体用 RGB 格式来存放一个色值。大小范围 [0, 255]
@@ -162,7 +162,6 @@ void Update2Detas();
 int main(int argc, char* argv) 
 {
     (void)argc, (void)argv;
-    SDL_Log("Hello 2r3");
 
     // init SDL library
     Initlib(SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO));
