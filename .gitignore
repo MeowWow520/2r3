@@ -16,3 +16,6 @@
 
 # 忽略 claude 输出
 /claude-output.md
+
+# 忽略 inno setup 输出
+/setup.exe
