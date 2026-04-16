@@ -1,8 +1,12 @@
 #include <iostream>
 #include <vector>
+#include <unordered_map>
+#include <string>
 #include <SDL3/SDL.h>
 
 
+#define WHEEL_RUN_SCALE 10.00f;
+#define MOUTH_RUN_SCALE 00.05f;
 /**
  * RGB 是一个自定义的结构体用 RGB 格式来存放一个色值。大小范围 [0, 255]
  * @param r 红色分量
@@ -49,9 +53,10 @@ const int Width_ = 800;
 const int Height_ =  800;
 
 // 3D 投影参数
-float FOCAL_LENGTH = 1000.0f;  // 焦距（决定透视强度）
-float CAMERA_Z = 500.0f;      // 相机距离
-float rotationY = 0.0f;       // Y轴旋转角度
+float FOCAL_LENGTH = 1000.00f;  // 焦距（决定透视强度）
+float CAMERA_Z = 500.00f;      // 相机距离
+float rotationY = 0.00f;       // Y轴旋转角度
+float rotationX = 0.00f;       // Y轴旋转角度
 
 
 SDL_Window* window_ = nullptr;
@@ -95,6 +100,9 @@ bool IsKeyDown[4] = {
     false  // SDLK_D
 };
 
+
+std::unordered_map<std::string, float> EventValue;
+
 /**
  * Initlib 是初始化的时候，判断是否失败的函数
  * @param flags 传入的一个逻辑表达式。正常工作应传入 true
@@ -121,8 +129,17 @@ float transY(float y);
  * @param point 原始 3 维点
  * @param angle 旋转角度（弧度）
  * @return 旋转后的 3 维点
+ * @note 描述可能有误
  */
 vec3 rotateY(vec3 point, float angle);
+/**
+ * rotateX 是将 3 维点绕 X 轴旋转的函数
+ * @param point 原始 3 维点
+ * @param angle 旋转角度（弧度）
+ * @return 旋转后的 3 维点
+ * @note 描述可能有误
+ */
+vec3 rotateX(vec3 point, float angle);
 /**
  * SetDrawColor 是设置画笔颜色的函数。
  * @param rgb 画笔的颜色
@@ -142,22 +159,28 @@ void DrawPOINT(SDL_FRect fr);
 void DrawPOINTS();
 void Update2Detas();
 
-
 int main(int argc, char* argv) 
 {
     (void)argc, (void)argv;
     SDL_Log("Hello 2r3");
 
     // init SDL library
-    if (Initlib(SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO)))
-        SDL_Log("init SDL library successfully");
+    Initlib(SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO));
 
     // create window and renderer
     window_ = SDL_CreateWindow(Title_, 
                                Width_, 
                                Height_, 
                                SDL_WINDOW_RESIZABLE);
+    SDL_SetWindowRelativeMouseMode(window_, true);
+    SDL_HideCursor();
     renderer_ = SDL_CreateRenderer(window_, NULL);
+    
+
+    EventValue.insert_or_assign("SDL_EVENT_MOUSE_WHEEL_Y", 0.0f);
+    EventValue.insert_or_assign("SDL_EVENT_MOUSE_MOTION_X", 0.0f);
+    EventValue.insert_or_assign("SDL_EVENT_MOUSE_MOTION_Y", 0.0f);
+
 
     // main loop
     auto FrameTime = (1e9 / FPS);
@@ -196,16 +219,39 @@ void HendleEvents() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
+            // 窗口失去焦点
+            case(SDL_EVENT_WINDOW_FOCUS_LOST): {
+                SDL_SetWindowRelativeMouseMode(window_, false);
+                SDL_ShowCursor();
+                break;
+            }
+            // 窗口获得焦点
+            case(SDL_EVENT_WINDOW_FOCUS_GAINED): {
+                SDL_SetWindowRelativeMouseMode(window_, true);
+                SDL_HideCursor();
+                break;
+            }
+            // 退出
             case(SDL_EVENT_QUIT): {
                 IsGoing_ = false;
-                SDL_Log("Recieving SDL_EVENT_QUIT, main loop quit");
+                break;
+            }
+            // 滚轮事件
+            case(SDL_EVENT_MOUSE_WHEEL): {
+                EventValue["SDL_EVENT_MOUSE_WHEEL_Y"] = event.wheel.y;
+                break;
+            }
+            // 鼠标移动
+            case(SDL_EVENT_MOUSE_MOTION): {
+                EventValue["SDL_EVENT_MOUSE_MOTION_X"] = event.motion.xrel;
+                EventValue["SDL_EVENT_MOUSE_MOTION_Y"] = event.motion.yrel;
                 break;
             }
             case(SDL_EVENT_KEY_DOWN): {
                 switch (event.key.key) {
-                    case(SDLK_ESCAPE): { IsGoing_ = false; break; }
-                    case(SDLK_F1): { IsDrawPOINTS_ =!IsDrawPOINTS_; break; }
-                    case(SDLK_F2): { IsDrawLINE_ =!IsDrawLINE_; break; };
+                    case(SDLK_ESCAPE): { IsGoing_  = !IsGoing_;      break; }
+                    case(SDLK_F1): { IsDrawPOINTS_ = !IsDrawPOINTS_; break; }
+                    case(SDLK_F2): { IsDrawLINE_   = !IsDrawLINE_;   break; };
 
                     case(SDLK_W): { IsKeyDown[0] = true; break; };
                     case(SDLK_A): { IsKeyDown[1] = true; break; };
@@ -221,10 +267,24 @@ void HendleEvents() {
 };
 
 void Update() {
-    rotationY += 0.03f;
-    Update2Detas();
     if (IsKeyDown[0]) CAMERA_Z -= 10.00f;
     if (IsKeyDown[2]) CAMERA_Z += 10.00f;
+
+    // 更新滚轮
+    float Wheel_Y = EventValue["SDL_EVENT_MOUSE_WHEEL_Y"];
+    if (Wheel_Y != 0.00f) CAMERA_Z += Wheel_Y * WHEEL_RUN_SCALE;
+    EventValue["SDL_EVENT_MOUSE_WHEEL_Y"] = 0.00f;
+
+    float Mouth_Mov_X = EventValue["SDL_EVENT_MOUSE_MOTION_X"];
+    if (Mouth_Mov_X != 0.00f) rotationX += Mouth_Mov_X * MOUTH_RUN_SCALE;
+    EventValue["SDL_EVENT_MOUSE_MOTION_X"] = 0.00f;
+
+    float Mouth_Mov_Y = EventValue["SDL_EVENT_MOUSE_MOTION_Y"];
+    if (Mouth_Mov_Y != 0.00f) rotationY += Mouth_Mov_Y * MOUTH_RUN_SCALE;
+    EventValue["SDL_EVENT_MOUSE_MOTION_Y"] = 0.00f;
+
+
+    Update2Detas();
 };
 
 void Render() {
@@ -246,6 +306,17 @@ float transY(float y)
 }
 
 vec3 rotateY(vec3 point, float angle) {
+
+    float cosA = cos(angle);
+    float sinA = sin(angle);
+    return {
+        point.x,
+        point.y * cosA - point.z * sinA,
+        point.y * sinA + point.z * cosA
+    };
+}
+
+vec3 rotateX(vec3 point, float angle) {
     float cosA = cos(angle);
     float sinA = sin(angle);
     return {
@@ -301,7 +372,7 @@ void Update2Detas() {
 
     for (const auto& point : _3DPointList) {
         // 先旋转点
-        vec3 rotated = rotateY(point, rotationY);
+        vec3 rotated = rotateX(rotateY(point, rotationY), rotationX);
         // 计算点到相机的距离
         float depth = rotated.z + CAMERA_Z;
         // 避免除零错误
