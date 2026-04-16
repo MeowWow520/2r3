@@ -65,4 +65,4 @@
 ### 渲染逻辑 Render()
 
 **顺序：** 
-BACKGRD -> LINE -> POINT
+BACKGRD -> SURFACE -> LINE -> POINT
