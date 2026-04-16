@@ -35,13 +35,14 @@ struct vec3 {
     float y;
     float z;
 };
+// p.s. 你对这么齐有个蛋的用啊
 // 主循环的开关 true 代表运行主循环；false 代表停止主循环
-bool IsGoing_ = true;
-// 是否打印当前的帧率
-bool IsLogFPS_ = false;
-bool IsDrawBACKGRD_ = true;
-bool IsDrawLINE_ = true;
-bool IsDrawPOINTS_ = true;
+bool IsGoing_       = true  ;
+bool IsLogFPS_      = false ;
+bool IsDrawBACKGRD_ = true  ;
+bool IsDrawLINE_    = true  ;
+bool IsDrawPOINTS_  = true  ;
+bool IsDrawSurface_ = true  ;
 // 窗口标题
 const char* Title_ = "2r3";
 // 渲染“点”的大小。点为一个正方形图像，这是图像的边长
@@ -54,9 +55,9 @@ const int Height_ =  800;
 
 // 3D 投影参数
 float FOCAL_LENGTH = 1000.00f;  // 焦距（决定透视强度）
-float CAMERA_Z = 500.00f;      // 相机距离
-float rotationY = 0.00f;       // Y轴旋转角度
-float rotationX = 0.00f;       // Y轴旋转角度
+float CAMERA_Z     = 500.00f;   // 相机距离
+float rotationY    = 0.00f;     // Y轴旋转角度
+float rotationX    = 0.00f;     // Y轴旋转角度
 
 
 SDL_Window* window_ = nullptr;
@@ -67,7 +68,10 @@ const RGB BACKGRD = {2  , 62 , 138}; // #023E8A
 // 点的颜色
 const RGB POINT   = {255, 0  , 110}; // #FF016E
 // 线段的颜色
-const RGB LINE    = {254, 228, 64 }; // #FEE440
+const RGB LINE    = {217, 237, 146}; // #FEE440
+// 面的颜色
+const RGB SURFACE = {254, 228, 64 }; // #99d98c
+
 
 // 在标准正交坐标系中的 3 维点的集合
 std::vector<vec3> _3DPointList = {
@@ -92,6 +96,15 @@ std::vector<vec2> LineList = {
     {3, 7}, {2, 6}, {4, 5},
     {4, 6}, {5, 7}, {7, 6}
 };
+
+/**
+ * SurfaceList 存储点的索引，每一个元素为一个 vec3
+ * 其中 vec3 的三个数值为 _3DPointList 的点的集合
+ */
+std::vector<vec3> SurfaceList = {
+    {0, 1, 2}, {1, 2, 3}, {2, 3, 4}
+};
+
 
 bool IsKeyDown[4] = { 
     false, // SDLK_W
@@ -157,6 +170,12 @@ void DrawLINES();
 void DrawPOINT(SDL_FRect fr);
 // 画制所有点
 void DrawPOINTS();
+/** 
+ * 画制一个面
+ * @param sf 面的 3 个顶点的索引
+ */
+void DrawSurface(vec3 sf);
+void DrawSurfaces();
 void Update2Detas();
 
 int main(int argc, char* argv) 
@@ -288,6 +307,7 @@ void Update() {
 
 void Render() {
     if (IsDrawBACKGRD_) DrawBACKGRD();
+    if (IsDrawSurface_) DrawSurfaces();
     if (IsDrawLINE_) DrawLINES();
     if (IsDrawPOINTS_) DrawPOINTS();
     SDL_RenderPresent(renderer_);
@@ -366,7 +386,8 @@ void DrawPOINTS() {
         DrawPOINT(_2DPointList[i]);
 };
 
-void Update2Detas() {
+void Update2Detas()
+{
     _2DPointList.clear();  // 清空旧数据
 
     for (const auto& point : _3DPointList) {
@@ -387,4 +408,31 @@ void Update2Detas() {
             size, size };
         _2DPointList.push_back(Temp);
     }
+};
+
+
+void DrawSurface(vec3 sf)
+{
+    // 三个点
+    SDL_FRect p1 = _2DPointList[sf.x];
+    SDL_Vertex face[3];
+    for (int i = 0; i < 3; i++) {
+        face[i].color = {SURFACE.r / 255.00f,
+                         SURFACE.g / 255.00f,
+                         SURFACE.b / 255.00f, 0};
+    }
+    face[0].position.x = _2DPointList[sf.x].x;
+    face[0].position.y = _2DPointList[sf.x].y;
+    face[1].position.x = _2DPointList[sf.y].x;
+    face[1].position.y = _2DPointList[sf.y].y;
+    face[2].position.x = _2DPointList[sf.z].x;
+    face[2].position.y = _2DPointList[sf.z].y;
+
+    SDL_RenderGeometry(renderer_, NULL, face, 3, NULL, 0);
+};
+
+void DrawSurfaces()
+{
+    for (int i = 0; i < SurfaceList.size(); i++)
+        DrawSurface(SurfaceList[i]);
 };
