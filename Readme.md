@@ -8,7 +8,7 @@
 x' = x/z
 y' = y/z
 ```
-### ChangeLogs -> [Here](./ChangeLog.md)
+### ChangeLogs -> [Here](./ChangeLogs.md)
 ### Documents
 ```
 📁 EscapeFromGhost    # 项目根目录
