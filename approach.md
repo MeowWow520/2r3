@@ -39,6 +39,7 @@
     <td><img src="./assets/2r3-example.png" width="400"></td>
     <td><img src="./assets/3DDataTransformationFlow.png" width="400"></td>
     <td><img src="./assets/RenderingSystemDataFlow.png" width="400"></td>
+    <td><img src="./assets/feature-surface.gif" width="400"></td>
 
   </tr>
 </table>
