@@ -169,6 +169,8 @@ void DrawLINES();
  * @param fr SDL 渲染的 2 维图形
  */
 void DrawPOINT(SDL_FRect fr);
+// 检查是否渲染点
+bool ChackAndDrawPoint(SDL_FRect point);
 // 画制所有点
 void DrawPOINTS();
 /** 
@@ -228,13 +230,15 @@ int main(int argc, char* argv)
 
 
 
-bool Initlib(bool flags) {
+bool Initlib(bool flags)
+{
     if (flags == true) return true;
     SDL_Log(SDL_GetError());
     return false;
 };
 
-void HendleEvents() {
+void HendleEvents()
+{
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
@@ -285,7 +289,8 @@ void HendleEvents() {
     }
 };
 
-void Update() {
+void Update()
+{
     if (IsKeyDown[0]) CAMERA_Z -= 10.00f;
     if (IsKeyDown[2]) CAMERA_Z += 10.00f;
 
@@ -306,7 +311,8 @@ void Update() {
     Update2Detas();
 };
 
-void Render() {
+void Render()
+{
     if (IsDrawBACKGRD_) DrawBACKGRD();
     if (IsDrawSurface_) DrawSurfaces();
     if (IsDrawLINE_) DrawLINES();
@@ -325,7 +331,8 @@ float transY(float y)
     return (float)(Height_ / 2) - y;
 }
 
-vec3 rotateY(vec3 point, float angle) {
+vec3 rotateY(vec3 point, float angle)
+{
 
     float cosA = cos(angle);
     float sinA = sin(angle);
@@ -336,7 +343,8 @@ vec3 rotateY(vec3 point, float angle) {
     };
 }
 
-vec3 rotateX(vec3 point, float angle) {
+vec3 rotateX(vec3 point, float angle)
+{
     float cosA = cos(angle);
     float sinA = sin(angle);
     return {
@@ -351,22 +359,21 @@ void SetDrawColor(RGB rgb)
     SDL_SetRenderDrawColor(renderer_, rgb.r, rgb.g, rgb.b, 255);
 }
 
-void DrawBACKGRD() {
+void DrawBACKGRD()
+{
     SDL_FRect BackGRD_FR = {0.00, 0.00, (float)Width_, (float)Height_};
     SetDrawColor(BACKGRD);
     SDL_RenderFillRect(renderer_, &BackGRD_FR);
 };
 
-void DrawLINE(vec2 vc2) {
+void DrawLINE(vec2 vc2)
+{
     SetDrawColor(LINE);
-    int start = vc2.s;
-    int end   = vc2.e;
-    float x1, y1, x2, y2;
-    x1 = _2DPointList[start].x;
-    y1 = _2DPointList[start].y;
-    x2 = _2DPointList[end].x;
-    y2 = _2DPointList[end].y;
-    SDL_RenderLine(renderer_, x1, y1, x2, y2);
+    SDL_RenderLine(renderer_, 
+        _2DPointList[vc2.s].x,
+        _2DPointList[vc2.s].y,
+        _2DPointList[vc2.e].x,
+        _2DPointList[vc2.e].y);
 };
 
 void DrawLINES() {
@@ -374,7 +381,8 @@ void DrawLINES() {
         DrawLINE(Line);
 };
 
-void DrawPOINT(SDL_FRect fr) {
+void DrawPOINT(SDL_FRect fr)
+{
     SetDrawColor(POINT);
     SDL_FRect Temp = {fr.x - (POINT_SIZE / 2),
                       fr.y - (POINT_SIZE / 2),
@@ -382,7 +390,16 @@ void DrawPOINT(SDL_FRect fr) {
     SDL_RenderFillRect(renderer_, &Temp);
 };
 
-void DrawPOINTS() {
+#ifdef 1
+bool ChackAndDrawPoint(SDL_FRect point)
+{
+
+    if (SDL_HasRectIntersectionFloat(&point, const SDL_FRect *B))
+};
+#endif
+
+void DrawPOINTS()
+{
     for (int i = 0; i < _2DPointList.size(); i++)
         DrawPOINT(_2DPointList[i]);
 };
