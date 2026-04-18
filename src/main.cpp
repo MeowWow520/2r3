@@ -66,11 +66,11 @@ SDL_Renderer* renderer_ = nullptr;
 // 背景的颜色
 const RGB BACKGRD = {2  , 62 , 138}; // #023E8A
 // 点的颜色
-const RGB POINT   = {255, 0  , 110}; // #FF016E
+const RGB POINT   = {217, 237, 146}; // #FF016E
 // 线段的颜色
-const RGB LINE    = {217, 237, 146}; // #FEE440
+const RGB LINE    = {255, 0  , 110}; // #FEE440
 // 面的颜色
-const RGB SURFACE = {254, 228, 64 }; // #99d98c
+const RGB SURFACE = {254, 228, 64 }; // #99D98C
 
 
 // 在标准正交坐标系中的 3 维点的集合
@@ -169,8 +169,6 @@ void DrawLINES();
  * @param fr SDL 渲染的 2 维图形
  */
 void DrawPOINT(SDL_FRect fr);
-// 检查是否渲染点
-bool ChackAndDrawPoint(SDL_FRect point);
 // 画制所有点
 void DrawPOINTS();
 /** 
@@ -314,8 +312,8 @@ void Update()
 void Render()
 {
     if (IsDrawBACKGRD_) DrawBACKGRD();
-    if (IsDrawSurface_) DrawSurfaces();
     if (IsDrawLINE_) DrawLINES();
+    if (IsDrawSurface_) DrawSurfaces();
     if (IsDrawPOINTS_) DrawPOINTS();
     SDL_RenderPresent(renderer_);
     for (int i = 0 ; i < sizeof(IsKeyDown)/sizeof(IsKeyDown[0]); i++) IsKeyDown[i] = false;
@@ -390,13 +388,6 @@ void DrawPOINT(SDL_FRect fr)
     SDL_RenderFillRect(renderer_, &Temp);
 };
 
-#ifdef 1
-bool ChackAndDrawPoint(SDL_FRect point)
-{
-
-    if (SDL_HasRectIntersectionFloat(&point, const SDL_FRect *B))
-};
-#endif
 
 void DrawPOINTS()
 {
