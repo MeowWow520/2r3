@@ -13,11 +13,11 @@
  * @param g 绿色分量
  * @param b 蓝色分量
  */
-struct RGB {
+typedef struct {
     Uint8 r;
     Uint8 g;
     Uint8 b;
-};
+} RGB;
 
 struct vec2 {
     int s;
